@@ -10,6 +10,8 @@ RUN unzip -o /tmp/vector-tiles.zip
 RUN rm -f /tmp/*.zip
 
 ADD resources/redirect.html $CATALINA_HOME/webapps/ROOT/index.html
+ADD resources/web.xml $CATALINA_HOME/webapps/geoserver/WEB-INF/web.xml
+
 
 # Delete resources after installation
 RUN rm -rf /tmp/resources
