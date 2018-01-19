@@ -1,0 +1,17 @@
+FROM kartoza/geoserver:2.12.0
+MAINTAINER Alex Leith<alex.leith@tidech.org>
+
+# Custom Tidetech stuff
+# Core
+RUN wget -c https://sourceforge.net/projects/geoserver/files/GeoServer/${GS_VERSION}/extensions/geoserver-${GS_VERSION}-vectortiles-plugin.zip -O /tmp/vector-tiles.zip
+
+WORKDIR $CATALINA_HOME/webapps/geoserver/WEB-INF/lib
+RUN unzip -o /tmp/vector-tiles.zip
+RUN rm -f /tmp/*.zip
+
+ADD resources/redirect.html $CATALINA_HOME/webapps/ROOT/index.html
+
+# Delete resources after installation
+RUN rm -rf /tmp/resources
+
+WORKDIR $GEOSERVER_DATA_DIR

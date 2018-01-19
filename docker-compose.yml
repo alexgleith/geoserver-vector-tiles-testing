@@ -1,0 +1,21 @@
+version: '2'
+services:
+  geoserver:
+    build:
+      context: .
+      dockerfile: DockerfileGeoServer
+    volumes:
+      - ./data_dir:/opt/geoserver/data_dir
+    ports:
+      - "8080:8080"
+  node:
+    build:
+      context: .
+      dockerfile: DockerfileWebpack
+    environment:
+      - PORT=80
+      - HOST=0.0.0.0
+    volumes:
+      - ./webapp:/code
+    ports:
+      - "80:80"

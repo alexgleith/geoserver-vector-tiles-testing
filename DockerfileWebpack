@@ -1,0 +1,32 @@
+FROM node:9.4.0
+LABEL maintainer="aleith@crcsi.com.au"
+
+RUN apt-get update && apt-get install -y apt-transport-https
+
+ENV APPDIR=/code
+WORKDIR $APPDIR
+
+# Install node requirements with yarn, it's better
+RUN curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add -
+RUN echo "deb https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources.list.d/yarn.list
+RUN apt-get update && apt-get install -y yarn
+
+# Add the folders we need
+ADD webapp/build $APPDIR/build
+ADD webapp/config $APPDIR/config
+ADD webapp/src $APPDIR/src
+ADD webapp/static $APPDIR/static
+
+# ... and the files
+ADD webapp/index.html $APPDIR/index.html
+ADD webapp/package.json $APPDIR/package.json
+ADD webapp/.eslintrc.js $APPDIR/.eslintrc.js
+ADD webapp/yarn.lock $APPDIR/yarn.lock
+
+# This should cache the files
+RUN yarn install
+
+# Mount the source directly in to /code to ensure you're doing live reloads
+
+# This command runs yarn (which updates/installs packages) and then runs the npm dev command, which runs webpack
+CMD yarn && yarn run dev
