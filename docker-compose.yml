@@ -8,6 +8,12 @@ services:
       - ./data_dir:/opt/geoserver/data_dir
     ports:
       - "8080:8080"
+  mbtiles:
+    image: alexgleith/mbtiles-server
+    volumes:
+      - ./mbtiles:/root/mbtiles
+    ports:
+      - "5000:5000"
   node:
     build:
       context: .
