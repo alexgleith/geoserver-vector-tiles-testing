@@ -9,7 +9,7 @@ services:
     ports:
       - "8080:8080"
   mbtiles:
-    image: alexgleith/mbtiles-server
+    image: deniscarriere/mbtiles-server
     volumes:
       - ./mbtiles:/root/mbtiles
     ports:

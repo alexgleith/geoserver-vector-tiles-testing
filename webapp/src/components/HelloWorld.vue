@@ -7,6 +7,24 @@
 
 <script>
 import mapboxgl from 'mapbox-gl'
+
+var lastPopup = null
+var processClick = function (map, e) {
+  if (e.features.length > 0) {
+    map.getSource('selection').setData(e.features[0].toJSON())
+    var thisHTML = "<p>"
+    for (var prop in e.features[0].properties) {
+      thisHTML += "<strong>" + prop + ":</strong> " + e.features[0].properties[prop] + "<br>"
+    }
+    thisHTML += "</p>"
+
+    lastPopup = new mapboxgl.Popup()
+      .setLngLat(e.lngLat)
+      .setHTML(thisHTML)
+      .addTo(map)
+  }
+}
+
 export default {
   name: 'HelloWorld',
   mounted () {
@@ -33,6 +51,27 @@ export default {
           break
         }
       }
+
+      // Selection
+      map.addSource("selection", {
+        type: "geojson",
+        data: {
+          "type": "FeatureCollection",
+          "features": []
+        }
+      })
+
+      map.addLayer({
+        "id": "selection",
+        "type": "line",
+        "source": "selection",
+        "layout": {},
+        "paint": {
+          "line-color": "#ffff00",
+          "line-width": 3,
+          "line-opacity": 0.8
+        }
+      })
 
       // Geoserver layer
       map.addLayer({
@@ -75,23 +114,9 @@ export default {
       }, firstSymbolId)
     })
 
-    map.on('click', 'geoserver', function (e) {
-      if (e.features.length > 0) {
-        new mapboxgl.Popup()
-          .setLngLat(e.lngLat)
-          .setHTML('<p>PID: ' + e.features[0].properties.PID + '</p>')
-          .addTo(map)
-      }
-    })
+    map.on('click', 'geoserver', (e) => { processClick(map, e) })
 
-    map.on('click', 'mbtiles', function (e) {
-      if (e.features.length > 0) {
-        new mapboxgl.Popup()
-          .setLngLat(e.lngLat)
-          .setHTML('<p>PID: ' + e.features[0].properties.PID + '</p>')
-          .addTo(map)
-      }
-    })
+    map.on('click', 'mbtiles', (e) => { processClick(map, e) })
 
     var toggleableLayerIds = [ 'geoserver', 'mbtiles' ]
 
@@ -107,6 +132,15 @@ export default {
       link.textContent = id
 
       link.onclick = function (e) {
+        // Clear the selection layer
+        map.getSource('selection').setData({
+          "type": "FeatureCollection",
+          "features": []
+        })
+        if (lastPopup) {
+          lastPopup.remove()
+        }
+
         var clickedLayer = this.textContent
         e.preventDefault()
         e.stopPropagation()
