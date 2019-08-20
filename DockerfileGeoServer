@@ -1,7 +1,5 @@
 FROM kartoza/geoserver:2.12.0
-MAINTAINER Alex Leith<alex.leith@tidech.org>
 
-# Custom Tidetech stuff
 # Core
 RUN wget -c https://sourceforge.net/projects/geoserver/files/GeoServer/${GS_VERSION}/extensions/geoserver-${GS_VERSION}-vectortiles-plugin.zip -O /tmp/vector-tiles.zip
 
